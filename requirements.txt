@@ -1,0 +1,11 @@
+langchain
+langchain-openai
+langchain-community
+chromadb
+pypdf
+tiktoken
+python-dotenv
+langchain-huggingface
+sentence-transformers
+langchain-google-genai
+rank_bm25
