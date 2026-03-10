@@ -17,9 +17,6 @@ Unlike standard RAG tutorials that struggle with the "Precision vs. Context" dil
     * `hybrid`: Combines **Dense Vector Search** (semantic understanding) with **Sparse BM25 Search** (exact keyword matching), fused perfectly using the Reciprocal Rank Fusion (RRF) algorithm.
       **混合检索模式**：将稠密向量检索（语义理解）与稀疏 BM25 检索（精准关键词匹配）相结合，并通过倒数排序融合算法（RRF）实现完美的分数统合。
 
-* **📂 Multi-Document Cross-Synthesis | 多文档交叉综合对比**
-    Automatically loads and processes all PDFs within the `data/` directory. The system embeds metadata source tracking, allowing the LLM to perform complex cross-paper comparisons (e.g., contrasting Author A's view with Author B's view) without hallucinating sources.
-    自动加载并处理 `data/` 目录下的所有 PDF 文献。系统在底层嵌入了元数据溯源标签，使得大模型能够执行复杂的跨论文交叉对比（例如对比作者 A 与作者 B 的核心观点），彻底杜绝文献来源的幻觉张冠李戴。
 
 * **🧠 Local Embedding & Vector Store | 本地向量化与存储**
     Utilizes HuggingFace's `all-MiniLM-L6-v2` for rapid local embeddings and ChromaDB for persistent, high-dimensional vector storage.
@@ -39,3 +36,35 @@ Unlike standard RAG tutorials that struggle with the "Precision vs. Context" dil
 ```bash
 git clone [https://github.com/yourusername/homework_agent.git](https://github.com/yourusername/homework_agent.git)
 cd homework_agent
+```
+### 2. Set Up the Virtual Environment | 配置虚拟环境
+It is highly recommended to run this project in an isolated virtual environment.
+强烈建议在隔离的虚拟环境中运行此项目，避免依赖冲突。
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows use: .\.venv\Scripts\activate
+```
+
+### 3. Install Dependencies | 安装核心依赖
+```bash
+pip install -r requirements.txt
+```
+### 4. Configuration | 配置项目
+1. Place your academic PDFs into the data/ directory. / 将你的学术 PDF 文献放入 data/ 文件夹。
+
+2. Adjust your search strategy in src/config.py: / 在配置文件中设定你的检索引擎：
+```python
+# Choose your engine: "parent_child" OR "hybrid"
+SEARCH_MODE = "parent_child"
+```
+3. Set up your .env file with your preferred LLM API keys. / 在 .env 文件中配置你调用大模型所需的 API 密钥。
+### 5. Run the System | 启动系统
+```python
+python main.py
+```
+## 🧠 Why Parent-Child Retrieval? | 为什么选择父子块检索？
+In complex academic texts, standard chunking often breaks the logical flow. If a chunk is too large, the vector search dilutes the specific details. If a chunk is too small, the LLM loses the overarching narrative.
+在处理复杂的学术长难句时，标准的“一刀切”文本切分往往会破坏底层逻辑流。切得太大，向量搜索会稀释细节；切得太小，大模型又会丢失全局视野。
+
+By decoupling the search layer (child chunks) from the generation layer (parent chunks), this system achieves surgical precision during retrieval while providing the LLM with a panoramic view of the context.
+通过将**“检索层（子块）”与“生成层（父块）”**彻底解耦，本系统在检索阶段实现了外科手术级的精准打击，同时在生成阶段为大模型提供了全景式的上下文视野。
