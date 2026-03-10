@@ -25,7 +25,7 @@ TRANS_PROMPT =  ChatPromptTemplate.from_messages([
 ])
 
 EXTRACT_KEYWORD_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", "你是一个专业的信息检索专家。你的任务是从用户的提问中提取出最核心的学术关键词，用于数据库检索。\n"
+    ("system", "你是一个专业的信息检索专家。你的任务是从用户的提问中提取出最核心的学术关键词，用于数据库检索。不要拓展原本的题目意思。\n"
                "【绝对规则】: 只输出关键词，用空格分隔。绝对不要输出任何前缀（如'关键词是'）、解释性文字或标点符号。用英文回答"),
     ("user", "{question}")
 ])

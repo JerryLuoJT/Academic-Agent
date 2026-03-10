@@ -1,8 +1,10 @@
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from src.config import RETRIEVER_K, WEIGHTS
+from src.config import RETRIEVER_K, WEIGHTS, SEARCH_MODE
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.retrievers import BM25Retriever
+from langchain_classic.retrievers import ParentDocumentRetriever
+from langchain_core.stores import InMemoryStore
 
 class CustomEnsembleRetriever:
     def __init__(self, retrievers: list, weights):
@@ -64,6 +66,38 @@ class VectorRetriever:
 
     
     @staticmethod
+    def combine(docs:list):
+        #把检索到的文本和对应页数合并成一个字符串
+        return "\n\n".join(f"[Page{doc.metadata.get('page', 'unknown')}text]: {doc.page_content}" for doc in docs)
+    
+class ParentChildRetriever:
+    def create_retriever(parent_splitter, child_splitter,document):
+        print("Creating Parent-Child Retriever with Hash Mapping")
+        # 1. 创建父子块的哈希映射
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
+        print("Dense Retriever is creating")
+        vectorstore = Chroma(embedding_function=embeddings, collection_name="doc_retrieval_filter_metadata")
+        store = InMemoryStore()
+        
+        
+        
+        retriever = ParentDocumentRetriever(
+                vectorstore=vectorstore,
+                docstore=store,
+                child_splitter=child_splitter,
+                parent_splitter=parent_splitter,
+                search_kwargs = {"k": RETRIEVER_K}
+            
+            )
+        print("3. [Parent-Child] 正在内部切分、计算哈希并建立映射...")
+        retriever.add_documents(documents=document)
+        print("✅ 父子块哈希映射检索架构构建完成！\n")
+        return retriever
+    
+
+    
     def combine(docs:list):
         #把检索到的文本和对应页数合并成一个字符串
         return "\n\n".join(f"[Page{doc.metadata.get('page', 'unknown')}text]: {doc.page_content}" for doc in docs)
